@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">SensorApp</string>
+    <string name="sensor_count">Liczba czujnikow: %d</string>
+    <string name="show_subtitle">Pokaż podtytuł</string>
+    <string name="missing_sensor">Brak czujnika</string>
+    <string name="Light_sensor_Label">Light Sensor Value: %f</string>
+    <string name="Temperature_sensor_Label">Temperature Sensor Value: %f</string>
+    <string name="get_location">Pobierz lokalizacje</string>
+    <string name="click_to_get_location">Wciśnij przycisk aby pobrać ostatnią lokalizacje</string>
+    <string name="location_permission_denied">Brak uprawnień do lokalizacji</string>
+    <string name="location_text">Szerokość geograficzna: %1$.4f\nDługość geograficzna: %2$.4f\nCzas: %3$tr</string>
+    <string name="no_location">brak obecnej lokalizacji</string>
+    <string name="get_address">Pobierz adres</string>
+    <string name="address_text">"Adres: %1$s \n Czas: %2$tr"</string>
+    <string name="service_not_available">Serwis nie jest dostępny</string>
+    <string name="invalid_lat_long_used">Nieprawidłowe użycie lat long</string>
+    <string name="no_address_found">Nie znaleziono odpowiadającego adresu</string>
+
+</resources>
