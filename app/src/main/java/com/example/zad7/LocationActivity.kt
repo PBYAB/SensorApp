@@ -14,10 +14,12 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Locale
-import java.util.concurrent.ExecutionException
-import java.util.concurrent.Executors
-import java.util.concurrent.Future
 
 class LocationActivity : AppCompatActivity() {
     private lateinit var getLocationButton: Button
@@ -138,24 +140,21 @@ class LocationActivity : AppCompatActivity() {
     }
 
 
-    private fun executeGeocoding() {
-        if (::lastLocation.isInitialized) {
-            val executor = Executors.newSingleThreadExecutor()
-            val returnedAddress = executor.submit<String> { locationGeocoding(this, lastLocation) } as Future<String>
 
+    private fun executeGeocoding() = CoroutineScope(Dispatchers.IO).launch {
+        if (::lastLocation.isInitialized) {
             try {
-                val result = returnedAddress.get()
-                addressTextView.text = getString(R.string.address_text,
-                    result,
-                    System.currentTimeMillis())
-            } catch (e: ExecutionException) {
+                val result = async { locationGeocoding(this@LocationActivity, lastLocation) }.await()
+                withContext(Dispatchers.Main) {
+                    addressTextView.text = getString(R.string.address_text,
+                        result,
+                        System.currentTimeMillis())
+                }
+            } catch (e: Exception) {
                 Log.e(TAG, e.message.toString(), e)
-                Thread.currentThread().interrupt()
-            } catch (e: InterruptedException) {
-                Log.e(TAG, e.message.toString(), e)
-                Thread.currentThread().interrupt()
             }
         }
     }
+
 
 }
