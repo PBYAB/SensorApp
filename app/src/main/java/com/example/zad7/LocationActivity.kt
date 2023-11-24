@@ -6,12 +6,11 @@ import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.zad7.databinding.LocationActivityBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.CoroutineScope
@@ -22,13 +21,11 @@ import kotlinx.coroutines.withContext
 import java.util.Locale
 
 class LocationActivity : AppCompatActivity() {
-    private lateinit var getLocationButton: Button
-    private lateinit var getLocationTextView: TextView
+
     private lateinit var lastLocation : Location
-    private lateinit var locationTextView : TextView
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    private lateinit var addressTextView: TextView
-    private lateinit var getAddressButton: Button
+    private lateinit var binding: LocationActivityBinding
+
 
         companion object {
             private const val REQUEST_LOCATION_PERMISSION = 1
@@ -39,21 +36,16 @@ class LocationActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.location_activity)
+        binding = LocationActivityBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        getLocationButton = findViewById(R.id.get_location_button)
-        getLocationTextView = findViewById(R.id.get_location_text_view)
-        locationTextView = findViewById(R.id.location_text_view)
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-        addressTextView = findViewById(R.id.textview_address)
-        getAddressButton = findViewById(R.id.get_address_button)
 
-
-        getLocationButton.setOnClickListener {
+        binding.getLocationButton.setOnClickListener {
             getLocation()
         }
 
-        getAddressButton.setOnClickListener {
+        binding.getAddressButton.setOnClickListener {
             executeGeocoding()
         }
     }
@@ -73,14 +65,14 @@ class LocationActivity : AppCompatActivity() {
             fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
                 if(location != null) {
                     lastLocation = location
-                    locationTextView.text = getString(
+                    binding.locationTextView.text = getString(
                         R.string.location_text,
                         location.latitude,
                         location.longitude,
                         location.time
                     )
                 } else {
-                    locationTextView.text = getString(R.string.no_location)
+                    binding.locationTextView.text = getString(R.string.no_location)
                 }
             }
         }
@@ -146,7 +138,7 @@ class LocationActivity : AppCompatActivity() {
             try {
                 val result = async { locationGeocoding(this@LocationActivity, lastLocation) }.await()
                 withContext(Dispatchers.Main) {
-                    addressTextView.text = getString(R.string.address_text,
+                    binding.textviewAddress.text = getString(R.string.address_text,
                         result,
                         System.currentTimeMillis())
                 }
@@ -155,6 +147,5 @@ class LocationActivity : AppCompatActivity() {
             }
         }
     }
-
 
 }

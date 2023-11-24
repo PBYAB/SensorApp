@@ -1,6 +1,5 @@
 package com.example.zad7
 
-import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -9,31 +8,33 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.example.zad7.databinding.SensorDetailsActivityBinding
+
 
 class SensorDetailsActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var sensorManager: SensorManager
     private var sensorLight: Sensor? = null
     private var sensorTemperature: Sensor? = null
-    private lateinit var sensorLightTextView: TextView
-    private lateinit var sensorTemperatureTextView: TextView
+
+    private lateinit var binding: SensorDetailsActivityBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.sensor_details_activity)
 
-        sensorLightTextView = findViewById(R.id.sensor_Light_Label)
-        sensorTemperatureTextView = findViewById(R.id.sensor_Temperature_Label)
+        binding = SensorDetailsActivityBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         sensorLight = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
         sensorTemperature = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE)
 
         if (sensorLight == null) {
-            sensorLightTextView.text = getString(R.string.missing_sensor)
+            binding.sensorLightLabel.text = getString(R.string.missing_sensor)
         }
 
         if (sensorTemperature == null) {
-            sensorTemperatureTextView.text = getString(R.string.missing_sensor)
+            binding.sensorTemperatureLabel.text = getString(R.string.missing_sensor)
         }
 
         val sensorType = intent.getIntExtra(SensorActivity.KEY_EXTRA_SENSOR_INDEX, -1)
@@ -63,8 +64,8 @@ class SensorDetailsActivity : AppCompatActivity(), SensorEventListener {
         val currentValue = event?.values?.get(0)
 
         when (sensorType) {
-            Sensor.TYPE_LIGHT -> sensorLightTextView.text = getString(R.string.Light_sensor_Label, currentValue)
-            Sensor.TYPE_AMBIENT_TEMPERATURE -> sensorTemperatureTextView.text =
+            Sensor.TYPE_LIGHT -> binding.sensorLightLabel.text = getString(R.string.Light_sensor_Label, currentValue)
+            Sensor.TYPE_AMBIENT_TEMPERATURE -> binding.sensorTemperatureLabel.text =
                 getString(R.string.Temperature_sensor_Label, currentValue)
         }
     }
@@ -76,10 +77,10 @@ class SensorDetailsActivity : AppCompatActivity(), SensorEventListener {
     private fun displaySensorInformation(sensorType: Int) {
         when (sensorType) {
             Sensor.TYPE_LIGHT -> {
-                sensorTemperatureTextView.visibility = TextView.GONE
+                binding.sensorTemperatureLabel.visibility = TextView.GONE
             }
             Sensor.TYPE_AMBIENT_TEMPERATURE -> {
-                sensorLightTextView.visibility = TextView.GONE
+                binding.sensorLightLabel.visibility = TextView.GONE
             }
         }
     }

@@ -10,20 +10,20 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.zad7.databinding.SensorActivityBinding
+import com.example.zad7.databinding.SensorListItemBinding
 
 
 class SensorActivity : AppCompatActivity() {
 
     private lateinit var sensorManager: SensorManager
     private lateinit var sensorList: List<Sensor>
-    private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: SensorAdapter
     private var subtitleVisible = false
+    private lateinit var binding: SensorActivityBinding
 
     companion object{
         private const val KEY_SUBTITLE_VISIBLE = "Subtitle is visible"
@@ -38,19 +38,21 @@ class SensorActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.sensor_activity)
+        binding = SensorActivityBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         if (savedInstanceState != null) {
             subtitleVisible = savedInstanceState.getBoolean(KEY_SUBTITLE_VISIBLE);
         }
 
-        recyclerView = findViewById(R.id.sensor_recycler_view)
-        recyclerView.layoutManager = LinearLayoutManager(this)
+
+        binding.sensorRecyclerView.layoutManager = LinearLayoutManager(this)
 
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         sensorList = sensorManager.getSensorList(Sensor.TYPE_ALL)
 
         adapter = SensorAdapter(sensorList)
-        recyclerView.adapter = adapter
+        binding.sensorRecyclerView.adapter = adapter
 
     }
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -78,12 +80,9 @@ class SensorActivity : AppCompatActivity() {
         supportActionBar!!.subtitle = subtitle
     }
 
-    class SensorHolder(inflater: LayoutInflater, parent: ViewGroup) :
-        RecyclerView.ViewHolder(inflater.inflate(R.layout.sensor_list_item, parent, false)),
-        View.OnClickListener, View.OnLongClickListener {
+    class SensorHolder(private val binding: SensorListItemBinding) :
+        RecyclerView.ViewHolder(binding.root), View.OnClickListener, View.OnLongClickListener {
 
-        private val sensorIconImageView: ImageView = itemView.findViewById(R.id.sensor_item_image)
-        private val sensorNameTextView: TextView = itemView.findViewById(R.id.sensor_item_name)
         private lateinit var sensor: Sensor
 
         init {
@@ -93,19 +92,19 @@ class SensorActivity : AppCompatActivity() {
 
         fun bind(sensor: Sensor) {
             this.sensor = sensor
-            sensorIconImageView.setImageResource(R.drawable.ic_sensor_image)
-            sensorNameTextView.text = sensor.name
+            binding.sensorItemImage.setImageResource(R.drawable.ic_sensor_image)
+            binding.sensorItemName.text = sensor.name
 
             if (sensor.type == Sensor.TYPE_LIGHT || sensor.type == Sensor.TYPE_AMBIENT_TEMPERATURE) {
                 itemView.setOnClickListener(this)
-                sensorNameTextView.setTextColor(itemView.resources.getColor(R.color.red, null))
+                binding.sensorItemName.setTextColor(itemView.resources.getColor(R.color.red, null))
             } else if (sensor.type == Sensor.TYPE_MAGNETIC_FIELD) {
                 itemView.setOnClickListener {
                     val context = itemView.context
                     val intent = Intent(context, LocationActivity::class.java)
                     context.startActivity(intent)
                 }
-                sensorNameTextView.setTextColor(itemView.resources.getColor(R.color.blue, null))
+                binding.sensorItemName.setTextColor(itemView.resources.getColor(R.color.blue, null))
             } else {
                 itemView.setOnClickListener(null)
             }
@@ -135,8 +134,9 @@ class SensorActivity : AppCompatActivity() {
         RecyclerView.Adapter<SensorHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SensorHolder {
-            val layoutInflater = LayoutInflater.from(parent.context)
-            return SensorHolder(layoutInflater, parent)
+            val inflater = LayoutInflater.from(parent.context)
+            val binding = SensorListItemBinding.inflate(inflater, parent, false)
+            return SensorHolder(binding)
         }
 
         override fun onBindViewHolder(holder: SensorHolder, position: Int) {
